@@ -1,0 +1,9 @@
+.vscode
+*.code-workspace
+# Local History for Visual Studio Code
+.history/
+
+data
+.idea
+__pycache__
+runs
