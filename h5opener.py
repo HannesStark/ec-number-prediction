@@ -10,15 +10,24 @@ from sklearn.manifold import TSNE
 import seaborn as sns
 
 if __name__ == "__main__":
-    h5py_file= 'data/ec_vs_NOec_pide100_c50.h5'
-    fasta_path = 'data/nonRed_dataset/ec_vs_NOec_pide20_c50_train.fasta'
-    anno = 'data/annotations/merged_anno.txt'
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-h5", "--h5py_file", type=str,default='data/ec_vs_NOec_pide100_c50.h5', help="Path to data/ec_vs_NOec_pide100_c50.h5")
+    parser.add_argument("-anno", "--annotations", type=str,default='data/annotations/merged_anno.txt', help="Path to data/annotations/merged_anno.txt")
+    parser.add_argument("-br", "--breaking", type=int,default=-1 , help="Number of random samples after aquesitons stopps. (-1 == inf)")
+    parser.add_argument("-pp", "--perplexity", type=int,default=30 , help="perplexity")
+    parser.add_argument("-ni", "--n_iter", type=int,default=1000 , help="n_iter")
+    #parser.add_argument("-br", "--breaking", type=int,default=-1 , help="Number of random samples after aquesitons stopps. (-1 == inf)")
+    args = parser.parse_args()
+    print(args)
+    h5py_file= args.h5py_file
+    #fasta_path = 'data/nonRed_dataset/ec_vs_NOec_pide20_c50_train.fasta'
+    anno = args.annotations
     
-    print(h5py_file)
     proteins = []
     print('LOAD - This may take a while, if you run this the first time!')
     #https://stackoverflow.com/questions/20928136/input-and-output-numpy-arrays-to-h5py
-    count = 0
+    #count = 0
     #with h5py.File(h5py_file, 'r') as f:
     #    first_key = list(f.keys())[0]
     #    print("The first protein in the set has id {} and the embedding is of size {}.".format(first_key, f[first_key].shape[0]))
@@ -44,6 +53,7 @@ if __name__ == "__main__":
     with open(anno) as fp:
         with h5py.File(h5py_file, 'r') as h5:
             i = 0
+            j = 0
             for line in fp:
                 input = line.strip().split('\t')
                 if input[0] in h5:
@@ -53,12 +63,12 @@ if __name__ == "__main__":
                     color.append(reduceAnno(input[1]))
                     i +=1
                 else:
-                    pass
+                    j+=1
                     #print(input[0], 'NOT FOUND')
-                if i == 1000:
+                if i == args.breaking:
                     print('After', i, 'steppt i stop counted.')
                     break
-                sys.stdout.write('\r'+str(i))
+                sys.stdout.write('\r Num of labeld sampels:'+str(i) + "     Num of labels with out embeding: " + str(j))
 
     tsne = TSNE(n_components=2, perplexity=30.0, n_iter=1000, verbose=1)
     
