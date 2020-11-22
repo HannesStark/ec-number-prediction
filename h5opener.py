@@ -58,7 +58,7 @@ if __name__ == "__main__":
                 sys.stdout.write('\r' + str(i))
 
     perplexity = args.perplexity
-    tsne = TSNE(n_compon.ents=2, perplexity=perplexity, n_iter=args.n_iter, verbose=1)
+    tsne = TSNE(n_components=2, perplexity=perplexity, n_iter=args.n_iter, verbose=1)
 
     sns.set(rc={'figure.figsize': (11.7, 8.27)})
     palette = sns.color_palette("bright", len(np.unique(np.array(color))))
