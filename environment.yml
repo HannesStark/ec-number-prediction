@@ -1,0 +1,4 @@
+name: ProtPred
+channels:
+  - defaults
+prefix: /home/user/anaconda3/envs/ProtPred
