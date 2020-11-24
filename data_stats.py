@@ -8,7 +8,7 @@ import seaborn as sn
 sn.set_style('darkgrid')
 
 
-fasta_path = 'data/lookupSets/ec_vs_NOec_pide100_c50.fasta'
+fasta_path = 'sequence_files/nonRed_dataset.fasta'
 
 
 identifiers = []
