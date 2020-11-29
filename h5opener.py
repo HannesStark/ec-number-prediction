@@ -23,7 +23,7 @@ if __name__ == "__main__":
    
     h5py_file = args.h5py_file
     fasta_path = 'data/nonRed_dataset/ec_vs_NOec_pide20_c50_train.fasta'
-    anno = args.anno
+    anno = args.annotations
 
     print(h5py_file)
     proteins = []
