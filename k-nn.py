@@ -14,9 +14,9 @@ embeddings_path = 'data/ec_vs_NOec_pide100_c50.h5'
 val_data_fasta = 'data/nonRed_dataset/ec_vs_NOec_pide20_c50_val.fasta'
 test_data_fasta = 'data/nonRed_dataset/ec_vs_NOec_pide20_c50_test.fasta'
 temp_path = 'data/tmp/'
-data = 'val'
-results_file = data + 'knn.npy'
-embeddings_file = data + 'embeddings.npz'
+data = 'split'
+results_file = data + '_knn.npy'
+embeddings_file = data + '_embeddings.npz'
 
 val_identifiers = []
 val_embeddings = []
@@ -48,25 +48,38 @@ if embeddings_cached:
 if not results_cached:
     with h5py.File(embeddings_path, 'r') as h5:
         available_identifiers = h5.keys()
+        val_indices = np.random.randint(0,len(available_identifiers),500)
         for i, annotation in tqdm(enumerate(open(annotations_path))):
             annotation_array = annotation.strip().split('\t')
             identifier = annotation_array[0]
             # ec number is an array with 4 entries. One entry for each component of the ec number
             ec_number = annotation_array[1].split(';')[0].split('.')
-            if identifier in available_identifiers:
-                if identifier in val_identifiers:
-                    if not embeddings_cached:
-                        val_embeddings.append(h5[identifier][:])
-                    val_labels.append(ec_number)
-                elif identifier in test_identifiers:
-                    if not embeddings_cached:
-                        test_embeddings.append(h5[identifier][:])
-                    test_labels.append(ec_number)
-                else:
-                    train_identifiers.append(identifier)
-                    if not embeddings_cached:
-                        train_embeddings.append(h5[identifier][:])
-                    train_labels.append(ec_number)
+            if data == 'split':
+                if identifier in available_identifiers:
+                    if i in val_indices:
+                        if not embeddings_cached:
+                            val_embeddings.append(h5[identifier][:])
+                        val_labels.append(ec_number)
+                    else:
+                        train_identifiers.append(identifier)
+                        if not embeddings_cached:
+                            train_embeddings.append(h5[identifier][:])
+                        train_labels.append(ec_number)
+            else:
+                if identifier in available_identifiers:
+                    if identifier in val_identifiers:
+                        if not embeddings_cached:
+                            val_embeddings.append(h5[identifier][:])
+                        val_labels.append(ec_number)
+                    elif identifier in test_identifiers:
+                        if not embeddings_cached:
+                            test_embeddings.append(h5[identifier][:])
+                        test_labels.append(ec_number)
+                    else:
+                        train_identifiers.append(identifier)
+                        if not embeddings_cached:
+                            train_embeddings.append(h5[identifier][:])
+                        train_labels.append(ec_number)
     train_label1 = np.array(train_labels)[:, 0]  # take the first column of the array to get the first ec number
     val_label1 = np.array(val_labels)[:, 0]  # take the first column of the array to get the first ec number
 if not embeddings_cached:
