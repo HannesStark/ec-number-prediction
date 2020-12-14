@@ -66,9 +66,13 @@ def loadNPZ(path):
 #First time call: Loads the txt/fasta file, dumpes it in a .json. Returns dic(slow)
 #Other times: Load .json. Returns dic. (much faster)
 def loadBuffered(path : str):
+    t = time.time()
     if os.path.exists(path+'.json'):
         with open(path+'.json') as f:
-            return json.load(f)
+            a = json.load(f)
+            print('Time loadBuffered',path,time.time()-t)
+            return a
+            
     else:
         dic_id = {}        
         i = 0
@@ -89,12 +93,18 @@ def loadBuffered(path : str):
             raise NotImplementedError()
         with open(path +'.json', 'w') as f:
             json.dump(dic_id, f)
+        print('Time loadBuffered',path,time.time()-t)
         return dic_id
 
 def join_h5(h5py_file,otherFile,limit=-1):
     t = time.time()
-    
-    if type(otherFile) is str:
+    if otherFile == None:
+        with h5py.File(h5py_file, 'r') as h5:
+            print('Loading keys, this will really take a while. (On my PC it took 500 s... but don\'t worry. The next part takes even longer (~30 min).)')
+            keys = list(h5.keys())
+            print('Loaded all keys')
+        dic = None
+    elif type(otherFile) is str:
         dic = loadBuffered(otherFile)
         keys = dic.keys()
     elif type(otherFile) is list:
@@ -132,10 +142,16 @@ def join_h5(h5py_file,otherFile,limit=-1):
 
 def join_h5_buffer(h5py_file,otherFile,limit=-1,store=False):
     t = time.time()
-    if limit == -1:
-        buffername = otherFile+'.npz'
+    if otherFile == None:
+        if limit == -1:
+            buffername = h5py_file+'.npz'
+        else:
+            buffername = h5py_file+'_'+str(limit)+'.npz'
     else:
-        buffername = otherFile+'_'+str(limit)+'.npz'
+        if limit == -1:
+            buffername = otherFile+'.npz'
+        else:
+            buffername = otherFile+'_'+str(limit)+'.npz'
     if os.path.exists(buffername):
         a =  loadNPZ(buffername)
         print('Time join_h5_buffer',time.time()-t)
@@ -153,7 +169,7 @@ def join_h5_buffer(h5py_file,otherFile,limit=-1,store=False):
 
 
 #computes the confusionsmatrix an plots it.
-def plot_multiclass_all(val_label1,pred_val):
+def plot_multiclass_all(val_label1,pred_val,label=ECNUM):
     from sklearn.metrics import f1_score, matthews_corrcoef, confusion_matrix
     f1 = f1_score(val_label1, pred_val, average='macro')
     print('F1 :', f1)
@@ -179,6 +195,6 @@ def plot_multiclass_all(val_label1,pred_val):
                     'MCC: {:.4f}\n' \
                     'MCC stderr: {:.4f}\n'.format(accuracy, accuracy_stderr, mcc, mcc_stderr)
     print(results_string)
-
-    plot_class_accuracies(class_accuracy, class_accuracy_stderr)
+    if len(class_accuracy) == len(label):
+        plot_class_accuracies(class_accuracy, class_accuracy_stderr)
     plot_confusion(results.T)
