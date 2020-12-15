@@ -29,9 +29,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-h5", "--h5py_file", type=str,default='data/ec_vs_NOec_pide100_c50.h5', help="Path to data/ec_vs_NOec_pide100_c50.h5")
     parser.add_argument("-anno", "--annotations", type=str,default='data/annotations/merged_anno.txt', help="Path to data/annotations/merged_anno.txt")
-    parser.add_argument("-br", "--breaking", type=int,default=1000 , help="Number of random samples after aquesitons stopps. (-1 == inf)")
+    parser.add_argument("-br", "--breaking", type=int,default=-1 , help="Number of random samples after aquesitons stopps. (-1 == inf)")
     parser.add_argument("-k", "--k", type=int,default=5 , help="k-nn")
     parser.add_argument("-nonEC", "--nonEC", action="store_true", default=False, help="reduce embedings to (int), default value was 150 (0 is no reduction)")
+    parser.add_argument("-nonEC_EC7", "--nonEC_EC7", action="store_true", default=False, help="reduce embedings to (int), default value was 150 (0 is no reduction)")
     
     
     #parser.add_argument("-br", "--breaking", type=int,default=-1 , help="Number of random samples after aquesitons stopps. (-1 == inf)")
@@ -47,9 +48,19 @@ if __name__ == "__main__":
     # First I want to see the splitt only in the 6 main-classes, befor we do something fancy here.
     
     from utils import join_h5_buffer,plot_multiclass_all,join_h5,loadBuffered
-    if args.nonEC:
-        #identifiers,embeding,other = join_h5_buffer(h5py_file,None,limit=args.breaking,store=True)
-        identifiers,embeding,other = join_h5(h5py_file,None,limit=args.breaking)
+    if args.nonEC_EC7:
+        identifiers,embeding,other = join_h5_buffer(h5py_file,None,limit=args.breaking,store=True)
+        #identifiers,embeding,other = join_h5(h5py_file,None,limit=args.breaking)
+        anno_dic = loadBuffered(anno)
+        def reduceAnno(key: str,anno_dic):
+            if not key in anno_dic:
+                return 0
+            i = int(anno_dic[key][0])
+            return i
+        color = [reduceAnno(i,anno_dic) for i in identifiers]
+    elif args.nonEC:
+        identifiers,embeding,other = join_h5_buffer(h5py_file,None,limit=args.breaking,store=True)
+        #identifiers,embeding,other = join_h5(h5py_file,None,limit=args.breaking)
         anno_dic = loadBuffered(anno)
         def reduceAnno(id: str):
             if id in anno_dic:

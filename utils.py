@@ -167,6 +167,8 @@ def join_h5_buffer(h5py_file,otherFile,limit=-1,store=False):
             print('Time join_h5_buffer',time.time()-t)
             return a
 
+def get_h5():
+    return join_h5_buffer('data/ec_vs_NOec_pide100_c50.h5',None,store=True)[:-1]
 
 #computes the confusionsmatrix an plots it.
 def plot_multiclass_all(val_label1,pred_val,label=ECNUM):
