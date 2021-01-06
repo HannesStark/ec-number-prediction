@@ -1,4 +1,4 @@
-import numpy as np
+    import numpy as np
 import faiss
 from time import time
 import numpy as np
