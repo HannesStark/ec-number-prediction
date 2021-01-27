@@ -86,7 +86,8 @@ def loadBuffered(path : str):
                     i+=1
         elif path.endswith('.fasta'):
             for sequence in SeqIO.parse(path, "fasta"):
-                dic_id[sequence.id] = sequence.value
+                #print(sequence)
+                dic_id[sequence.id] = str(sequence.seq)
                 sys.stdout.write('\r' + str(i))
                 i+=1
         else:

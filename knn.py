@@ -19,6 +19,7 @@ class FaissKNeighbors:
 
     def predict(self, X):
         distances, indices = self.index.search(X.astype(np.float32), k=self.k)
+        print(distances,indices)
         votes = self.y[indices]
         predictions = np.array([np.argmax(np.bincount(x)) for x in votes])
         return predictions
@@ -78,7 +79,7 @@ if __name__ == "__main__":
     print('knn')
     knn = FaissKNeighbors(k=args.k)
     split = int(len(embeding)//5)
-    knn.fit(np.asarray(embeding[:-split]),np.asarray(color[:-split]));
+    knn.fit(np.asarray(embeding[:-split]),np.asarray(color[:-split]))
     t0 = time()
     pred_val = knn.predict(np.asarray(embeding[-split:]))
     val_label1 = np.asarray(color[-split:])
