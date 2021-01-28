@@ -172,7 +172,7 @@ def get_h5():
     return join_h5_buffer('data/ec_vs_NOec_pide100_c50.h5',None,store=True)[:-1]
 
 #computes the confusionsmatrix an plots it.
-def plot_multiclass_all(val_label1,pred_val,label=ECNUM):
+def plot_multiclass_all(val_label1,pred_val,label=ECNUM, show=True):
     from sklearn.metrics import f1_score, matthews_corrcoef, confusion_matrix
     f1 = f1_score(val_label1, pred_val, average='macro')
     print('F1 :', f1)
@@ -198,6 +198,8 @@ def plot_multiclass_all(val_label1,pred_val,label=ECNUM):
                     'MCC: {:.4f}\n' \
                     'MCC stderr: {:.4f}\n'.format(accuracy, accuracy_stderr, mcc, mcc_stderr)
     print(results_string)
-    if len(class_accuracy) == len(label):
-        plot_class_accuracies(class_accuracy, class_accuracy_stderr)
-    plot_confusion(results.T)
+    if show:
+        if len(class_accuracy) == len(label):
+            plot_class_accuracies(class_accuracy, class_accuracy_stderr)
+        plot_confusion(results.T)
+    return f1,accuracy,mcc
